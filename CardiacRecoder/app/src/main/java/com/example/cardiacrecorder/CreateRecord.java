@@ -21,23 +21,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class CreateRecord extends AppCompatActivity {
 
     private Button selectDate, selectTime, saveButton;
-    private String entryDate, entryTime, entryNotes;
-    private int entrySystolic, entryDiastolic, entryPulse;
+    private String entryDate, entryTime, entryNotes, fromActivity;
+    private int entrySystolic, entryDiastolic, entryPulse, levelCalculate;
     private EditText systolic, diastolic, pulse, notes;
-    private ImageView tickMark;
+    private ImageView tickMark, requiredSystolic, requiredDiastolic, requiredPulse, backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_record);
 
+        Intent intent = getIntent();
+        fromActivity = intent.getStringExtra("fromWhichActivity");
+
         getSupportActionBar().hide();
 
-        Intent intent = getIntent();
 
         selectDate = findViewById(R.id.date);
         selectTime = findViewById(R.id.time);
@@ -47,6 +50,10 @@ public class CreateRecord extends AppCompatActivity {
         diastolic = findViewById(R.id.diastolic);
         pulse = findViewById(R.id.pulse);
         notes = findViewById(R.id.notes);
+        requiredSystolic = findViewById(R.id.requiredSystolic);
+        requiredDiastolic = findViewById(R.id.requiredDiastolic);
+        requiredPulse = findViewById(R.id.requiredPulse);
+        backButton = findViewById(R.id.backButton);
 
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -56,25 +63,19 @@ public class CreateRecord extends AppCompatActivity {
         final int min = calendar.get(Calendar.MINUTE);
 
 
-
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm a");
-
-        String time = format.format(calendar.getTime());
+        Date date = new Date();
+        SimpleDateFormat formatTime = new SimpleDateFormat("hh.mm aa");
+        String time = formatTime.format(date);
         selectTime.setText(time);
         selectTime.setTextColor(Color.parseColor("#000000"));
 
-        String dateStr = "04/05/2010";
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
 
-        SimpleDateFormat curFormater = new SimpleDateFormat("dd/MM/yyyy");
-        Date dateObj = null;
-        try {
-            dateObj = curFormater.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(c);
 
-        String date = curFormater.format(dateObj);
-        selectDate.setText(date);
+        selectDate.setText(formattedDate);
         selectDate.setTextColor(Color.parseColor("#000000"));
 
         selectDate.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +86,21 @@ public class CreateRecord extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
                         month = month+1;
-                        String date = day+"/"+month+"/"+year;
+                        String monthName = "";
+                        if (month == 1) monthName = "JAN";
+                        else if (month == 2) monthName = "FEB";
+                        else if (month == 3) monthName = "MAR";
+                        else if (month == 4) monthName = "APR";
+                        else if (month == 5) monthName = "MAY";
+                        else if (month == 6) monthName = "JUN";
+                        else if (month == 7) monthName = "JUL";
+                        else if (month == 8) monthName = "AUG";
+                        else if (month == 9) monthName = "SEP";
+                        else if (month == 10) monthName = "OCT";
+                        else if (month == 11) monthName = "NOV";
+                        else if (month == 12) monthName = "DEC";
+
+                        String date = dayOfMonth+"-"+monthName+"-"+year;
                         selectDate.setText(date);
                         selectDate.setTextColor(Color.parseColor("#000000"));
 
@@ -119,21 +134,33 @@ public class CreateRecord extends AppCompatActivity {
             }
         });
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (fromActivity.equals("mainactivity")) {
+                    Intent intent = new Intent(CreateRecord.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            }
+        });
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                entryDate = selectDate.getText().toString();
-                entryTime = selectTime.getText().toString();
-                entrySystolic = Integer.parseInt(systolic.getText().toString());
-                entryDiastolic = Integer.parseInt(diastolic.getText().toString());
-                entryPulse = Integer.parseInt(pulse.getText().toString());
-                entryNotes = notes.getText().toString();
+                setValues();
 
+                if(checkValues()) {
+                    calculateLevel();
 
                     Intent intent1 = new Intent(CreateRecord.this, MainActivity.class);
                     startActivity(intent1);
                     finish();
+                }
 
             }
         });
@@ -141,19 +168,90 @@ public class CreateRecord extends AppCompatActivity {
         tickMark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                entryDate = selectDate.getText().toString();
-                entryTime = selectTime.getText().toString();
-                entrySystolic = Integer.parseInt(systolic.getText().toString());
-                entryDiastolic = Integer.parseInt(diastolic.getText().toString());
-                entryPulse = Integer.parseInt(pulse.getText().toString());
-                entryNotes = notes.getText().toString();
 
-                    Intent intent2 = new Intent(CreateRecord.this, MainActivity.class);
-                    startActivity(intent2);
+
+                setValues();
+
+                if (checkValues()) {
+                    calculateLevel();
+
+                    Intent intent1 = new Intent(CreateRecord.this, MainActivity.class);
+                    startActivity(intent1);
                     finish();
-
+                }
             }
         });
 
     }
+
+    private void setValues() {
+        entryDate = selectDate.getText().toString();
+        entryTime = selectTime.getText().toString();
+        if (systolic.getText().toString().length() != 0) entrySystolic = Integer.parseInt(systolic.getText().toString());
+        if (diastolic.getText().toString().length() != 0) entryDiastolic = Integer.parseInt(diastolic.getText().toString());
+        if (pulse.getText().toString().length() != 0) entryPulse = Integer.parseInt(pulse.getText().toString());
+        entryNotes = notes.getText().toString();
+    }
+
+    private boolean checkValues() {
+
+        if (TextUtils.isEmpty(systolic.getText().toString()) || TextUtils.isEmpty(diastolic.getText().toString()) || TextUtils.isEmpty(pulse.getText().toString()) || entrySystolic>370 || entryDiastolic < 10 || entrySystolic<entryDiastolic || entryPulse < 30 || entryPulse > 220) {
+
+            if (TextUtils.isEmpty(systolic.getText().toString())) {
+                systolic.setError("Please enter a value");
+                //requiredSystolic.setVisibility(View.VISIBLE);
+            }
+
+            if (TextUtils.isEmpty(diastolic.getText().toString())) {
+                diastolic.setError("Please enter a value");
+                //requiredDiastolic.setVisibility(View.VISIBLE);
+            }
+
+            if (TextUtils.isEmpty(pulse.getText().toString())) {
+                pulse.setError("Please enter a value");
+                //pulse.setVisibility(View.VISIBLE);
+            }
+
+            if (entrySystolic<entryDiastolic) {
+
+                systolic.setError("Systolic must be greater than Diastolic");
+                //requiredSystolic.setVisibility(View.VISIBLE);
+
+                diastolic.setError("Systolic must be greater than Diastolic");
+                //requiredDiastolic.setVisibility(View.VISIBLE);
+            }
+
+            if (entrySystolic > 370) {
+                systolic.setError("Invalid input");
+                //requiredSystolic.setVisibility(View.VISIBLE);
+            }
+
+            if (entryDiastolic < 10) {
+                diastolic.setError("Invalid input");
+                //requiredDiastolic.setVisibility(View.VISIBLE);
+            }
+
+            if (entryPulse < 30 || entryPulse > 220) {
+                pulse.setError("Invalid input");
+                //requiredPulse.setVisibility(View.VISIBLE);
+            }
+
+            return false;
+
+        }
+        return true;
+    }
+
+    void calculateLevel() {
+
+        if (entrySystolic < 110 || entryDiastolic < 60) levelCalculate = 1;
+        else if (entrySystolic < 120 || entryDiastolic < 80) levelCalculate = 2;
+        else if (entrySystolic < 130 || entryDiastolic < 85) levelCalculate = 3;
+        else if (entrySystolic >= 180 || entryDiastolic >= 110) levelCalculate = 7;
+        else if (entrySystolic >= 160 || entryDiastolic >= 100) levelCalculate = 6;
+        else if (entrySystolic >= 140 || entryDiastolic >= 90) levelCalculate = 5;
+        else if (entrySystolic >= 130 || entryDiastolic >= 85) levelCalculate = 4;
+
+    }
+
 }
