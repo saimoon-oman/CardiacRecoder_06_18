@@ -12,7 +12,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button measureButton, historyButton;
+    private Button measureButton, historyButton, addButton;
     private View measureUnderline, historyUnderline;
 
     @Override
@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
+        addButton = findViewById(R.id.addButton);
         measureButton = findViewById(R.id.measureButton);
         historyButton = findViewById(R.id.historyButton);
         measureUnderline = findViewById(R.id.measureUnderline);
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
