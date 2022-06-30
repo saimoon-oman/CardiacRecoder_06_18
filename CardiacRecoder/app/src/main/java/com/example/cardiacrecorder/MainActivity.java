@@ -1,5 +1,6 @@
 package com.example.cardiacrecorder;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -9,12 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button measureButton, historyButton, addButton;
+    private ImageButton editButton, deleteButton;
     private View measureUnderline, historyUnderline;
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         addButton = findViewById(R.id.addButton);
         measureButton = findViewById(R.id.measureButton);
         historyButton = findViewById(R.id.historyButton);
+
         measureUnderline = findViewById(R.id.measureUnderline);
         historyUnderline = findViewById(R.id.historyUnderline);
 
@@ -38,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
                 measureUnderline.setVisibility(View.VISIBLE);
                 historyUnderline.setVisibility(View.INVISIBLE);
+                addButton.setVisibility(View.VISIBLE);
 
                 replaceFragment(new MeasureActivity());
 
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
                 measureUnderline.setVisibility(View.INVISIBLE);
                 historyUnderline.setVisibility(View.VISIBLE);
+                addButton.setVisibility(View.INVISIBLE);
 
                 replaceFragment(new HistoryActivity());
 

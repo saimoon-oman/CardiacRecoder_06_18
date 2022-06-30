@@ -8,6 +8,19 @@ public class Record {
     protected String date;
     protected String time;
     protected String comment;
+    protected int level;
+
+    public Record() {}
+
+    public Record(String systolicPressure, String diastolicPressure, String pulse, String date, String time, String comment, int level) {
+        this.systolicPressure = systolicPressure;
+        this.diastolicPressure = diastolicPressure;
+        this.pulse = pulse;
+        this.date = date;
+        this.time = time;
+        this.comment = comment;
+        this.level = level;
+    }
 
     public String getSystolicPressure() {
         return systolicPressure;
@@ -55,6 +68,14 @@ public class Record {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
 
