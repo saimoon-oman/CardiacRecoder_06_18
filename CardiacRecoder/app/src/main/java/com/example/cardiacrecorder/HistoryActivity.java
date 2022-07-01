@@ -1,17 +1,20 @@
 package com.example.cardiacrecorder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 public class HistoryActivity extends Fragment {
 
+    ImageButton editButton;
     View view;
     ListView recordList;
 
@@ -21,6 +24,7 @@ public class HistoryActivity extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_history_activity, container, false);
 
+        editButton = view.findViewById(R.id.editButton);
         ListView recordList = view.findViewById(R.id.recordList);
 
         Record r1 = new Record("100", "70", "65", "28-JUN-2022", "10:30 AM", "Sick..", 1);
@@ -49,6 +53,14 @@ public class HistoryActivity extends Fragment {
 
         RecordListAdapter adapter = new RecordListAdapter(getContext(), R.id.rowLayout, recordArrayList);
         recordList.setAdapter(adapter);
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), EditDelete.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
